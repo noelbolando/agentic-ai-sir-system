@@ -1,0 +1,24 @@
+{
+  "sir_user_input_prompt": {
+    "beta": 0.3,
+    "gamma": 0.1,
+    "initial_infected": 10,
+    "population": 1000,
+    "timesteps": 50,
+    "runs": 5
+  },
+  "last_run_params": {
+    "beta": 0.3,
+    "gamma": 0.1,
+    "initial_infected": 10,
+    "population": 1000,
+    "timesteps": 50,
+    "runs": 5
+  },
+  "output_directory": "logs",
+  "sim_complete_msg": "Sure, here is a message that could be used:\n\n\"The SIR model simulation has been completed. Would you like to analyze the results? Please respond with 'yes' or 'no'. If you choose yes, I can provide you with information about the final number of susceptible, infected, and recovered individuals, as well as other relevant statistics.\"",
+  "last_analysis_question": "What was peak infection?",
+  "analysis_result_for_What would you like to analyze? ": "I'm not sure how to answer that yet.",
+  "analysis_result_for_What is the population size? ": "I'm not sure how to answer that yet.",
+  "analysis_result_for_What was peak infection?": "The peak number of infected agents was 499."
+}

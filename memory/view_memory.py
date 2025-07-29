@@ -1,6 +1,6 @@
 # memory/view_memory.py
 
-from memory.json_memory import JSONMemory
+from json_memory import JSONMemory
 
 def view_memory():
     mem = JSONMemory()
