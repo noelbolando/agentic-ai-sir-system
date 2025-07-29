@@ -35,24 +35,24 @@ The objective of this agentic AI system is to answer questions about the spread 
 To fulfill this objective, AI agents were assigned tasks and communication channels. These agents are discussed in more detail below.
 
 ## AI Agent Descriptions ##
-This project employs five AI agents to carry out the tasks described above. These agents and their associated tasks are outlined the following table:
+This project employs four AI agents to carry out the tasks described above. These agents and their associated tasks are outlined the following table:
 
 | **Agent** | **Primary Task** | **Tools Used** | **Inputs** | **Outputs** |
 |-----------|------------------|----------------|------------|-------------|
+| `ControlAgent` | Intelligent decision-making | LLM API, logic/planning | Analyzer/Reporter data | Rerun requests, summary feedback |
 | `RunnerAgent` | Run simulations | `subprocess`, `python3`, script | `seed`, `output_path`| CSV/log file |
 | `AnalyzerAgent`| Analyze simulation output | `pandas`, `numpy`| Output from `RunnerAgent`| Stats/dict |
 | `ReporterAgent` | Generate reports | Templating, graphing | Analysis results | Report file(s) |
-| `Main`| Orchestrate agents | Python logic, file I/O | Simulation plan | Full run pipeline |
-| `ControlAgent` | Intelligent decision-making | LLM API, logic/planning | Analyzer/Reporter data | Rerun requests, summary feedback |
 
 The AI agents are assigned roles, tasks, and tools, and are expected to communicate with one another through an interaction workflow which is described in more detail next.
 
 ## AI Agent Interaction Flow ##
 AI agents must interact and communicate after tasks are complete to track objective completion. The interaction between these agents is outlined below:
 
-1. **Main Agent (`main.py`)**  
-   - Kicks off the entire pipeline.  
-   - Decides how many simulations to run, generates seeds, and defines output paths.
+1. **Control Agent (`control_agent.py`)**  
+   - Monitors all outputs and agent messages.  
+   - Determines whether simulations should be rerun, adjusted, or summarized.  
+   - Powered by an LLM to reason over results and recommend actions.
 
 2. **Runner Agent (`runner_agent.py`)**  
    - Receives seed and output path from `Main`.  
@@ -69,10 +69,6 @@ AI agents must interact and communicate after tasks are complete to track object
    - Generates a visual/text report (graphs, markdown summaries, etc.).  
    - Stores or returns the report path.
 
-5. **Control Agent (`control_agent.py`)**  
-   - Monitors all outputs and agent messages.  
-   - Determines whether simulations should be rerun, adjusted, or summarized.  
-   - Powered by an LLM to reason over results and recommend actions.
 
 ## LLM Usage ##
 As previously mentioned, the Control Agent is powered by an LLM. For the purpose of this simpliest, but no simplier, model, the authors employed the use of an Ollama, an open-source LLM engine using Mistral LLM. To initialize the LLM, users must prime the model with the following command: `ollama run mistral`
