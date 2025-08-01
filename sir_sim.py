@@ -191,13 +191,11 @@ class Model:
             group_id += 1
         return groups
 
-    def _log_agent_states(self, step):
+    def log_agent_states(self, step):
         """
         Log agent states per times step.
         Logging to memory.
         """
-        self.agent_state_logs = []
-
         for agent in self.agents:
             self.agent_state_logs.append({
                 "run_id": self.run_id,
@@ -205,10 +203,8 @@ class Model:
                 "agent_id": agent.unique_id,
                 "state": agent.dState
             })
-        agent_state_df = pd.DataFrame(self.agent_state_logs)
-        print(agent_state_df.head(10))
 
-    def _log_infections(self, step):
+    def log_infections(self, step):
         """
         Log infection events with infector agents and infected agents per time step
         Logging to memory.
@@ -224,20 +220,23 @@ class Model:
                 self.infection_event_logs.append({
                     "run_id": self.run_id,
                     "step": step,
-                    "infector_id": infector.unique_id if infector else None,
-                    "infector_group_id": getattr(infector, "group_id", None) if infector else None,
-                    "infected_id": agent.unique_id,
-                    "infected_group_id": getattr(agent, "group_id", None),
+                    "infected_id": infector.unique_id if infector else None,
+                    "infected_group_id": getattr(infector, "group_id", None) if infector else None,
+                    "infector_id": agent.unique_id,
+                    "infector_group_id": getattr(agent, "group_id", None),
                     "duration": step - infector.infection_step if infector else None
                 })
-        infection_event_df = pd.DataFrame(self.infection_event_logs)
-        print(infection_event_df.head(10))
     
     def step(self, step):
-        """Run a single simulation step."""
+        """
+        Run a single simulation step and log agent states and infection events per step.
+        """
         for group in self.groups:
             group.update(self.environment, step)
-        self._log_infections(step)
+        self.log_agent_states(step)
+        self.agent_state_df = pd.DataFrame(self.agent_state_logs)
+        self.log_infections(step)
+        self.infection_df = pd.DataFrame(self.infection_event_logs)
         self.groups = self._initialize_groups()
     
     def run(self):
@@ -247,16 +246,40 @@ class Model:
 
 # === Main ===
 def main():
+    """
+    Main function to run the simulation.
+    Logging all agent states and infection events per run. 
+    """
     # Load simulation configuration
     config = load_config("utils/config.yaml")["simulation"]
     seed = config["seed"]
     n_runs = 30  # Number of runs (can also be added to the YAML file if needed)
 
+    all_agent_state_logs = []
+    all_infection_event_logs = []
+
     for run_id in range(n_runs):
         env = Environment(config["infection_prob"], config["infection_duration"], config["recovery_prob"])
         model = Model(config["num_agents"], config["num_steps"], config["num_contacts"], env, seed + run_id, run_id)
         model.run()
+
+        all_agent_state_logs.extend(model.agent_state_logs)
+        all_infection_event_logs.extend(model.infection_event_logs)
+        
         print(f"Run {run_id + 1} complete.")
+    
+    # Convert to DataFrames
+    agent_df = pd.DataFrame(all_agent_state_logs)
+    infection_df = pd.DataFrame(all_infection_event_logs)
+
+    agent_df.to_csv("logs/all_agent_logs.csv", index=False)
+    infection_df.to_csv("logs/all_infection_logs.csv", index=False)
+
+    return {
+        "run_id": model.run_id,
+        "infection_logs": model.infection_df.to_dict(orient="records"),
+        "agent_state_logs": model.agent_state_df.to_dict(orient="records")
+    }
 
 if __name__ == "__main__":
     main()

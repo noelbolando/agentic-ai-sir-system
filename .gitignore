@@ -1,3 +1,2 @@
 secrets.yaml
-agent_states.csv
-infection_events.csv
+logs

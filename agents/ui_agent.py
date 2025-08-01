@@ -25,12 +25,3 @@ class UIAgent:
 
         self.memory.save("sir_user_input_prompt", response)
         return response
-
-
-    def notify_sim_complete(self):
-        msg = "The SIR model has completed. Ask the user if they'd like to analyze the results."
-        response = self.llm.generate(msg)
-        self.memory.save("sim_complete_msg", response)
-        return response
-
-    

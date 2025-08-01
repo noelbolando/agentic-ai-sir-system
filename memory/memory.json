@@ -6,19 +6,5 @@
     "population": 1000,
     "timesteps": 50,
     "runs": 5
-  },
-  "last_run_params": {
-    "beta": 0.3,
-    "gamma": 0.1,
-    "initial_infected": 10,
-    "population": 1000,
-    "timesteps": 50,
-    "runs": 5
-  },
-  "output_directory": "logs",
-  "sim_complete_msg": "Hello! The simulation of the SIR model is now complete. Would you like to analyze the results? If yes, we can visualize the number of Susceptible, Infected, and Recovered individuals over time. Additionally, we can calculate relevant metrics such as the final size of the outbreak, basic reproduction number, and time needed for the disease to die out. Let me know if you'd like to proceed with the analysis.",
-  "last_analysis_question": "What was peak infection?",
-  "analysis_result_for_What would you like to analyze? ": "I'm not sure how to answer that yet.",
-  "analysis_result_for_What is the population size? ": "I'm not sure how to answer that yet.",
-  "analysis_result_for_What was peak infection?": "From the given dataset, the peak number of infected individuals was 500. This maximum infection occurred at one of the timesteps within the 250 total rows in the data, but the specific timestep is not provided in the summary.\n\nOn average, there were approximately 261.96 infected individuals across the 250 timesteps and 50 simulation runs. The dataset also shows that a total of 24,412 individuals recovered from the simulated epidemic. Lastly, the average number of susceptible individuals throughout the simulation was around 461.85."
+  }
 }
