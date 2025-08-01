@@ -1,6 +1,6 @@
 # agents/control_agent.py
 
-from agents.utils.llm_utils import OllamaLLM
+from utils.llm_utils import OllamaLLM
 from memory.json_memory import JSONMemory
 
 class ControlAgent:

@@ -1,12 +1,12 @@
 # agents/analyzer_agent.py
 
 import pandas as pd
-from agents.utils.llm_utils import OllamaLLM, summarize, build_prompt
+from utils.llm_utils import OllamaLLM, summarize, build_prompt
 import yaml
 from pathlib import Path
 
-from model.utils.config_loader import load_config
-from agents.utils.calculations_utils import calculate_peak_infection, calculate_avg_days_infected, get_model_parameters
+from utils.config_loader import load_config
+from utils.calculations_utils import calculate_peak_infection, calculate_avg_days_infected, get_model_parameters
 
 class AnalyzerAgent():
     def __init__(self, memory, model="mistral"):

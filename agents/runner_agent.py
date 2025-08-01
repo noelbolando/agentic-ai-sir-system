@@ -1,7 +1,7 @@
 # agents/runner_agent.py
 
 import os
-from model.main import main
+from sir_sim import main
 
 class RunnerAgent:
     def __init__(self, memory):

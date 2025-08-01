@@ -22,47 +22,29 @@ graph_builder = StateGraph(State)
 # === Node Setup ===
 
 def control_prompt_node(state: State):
-    print("\nDEBUG: Received state in control_prompt_node:")
-    print("Type of state:", type(state))
-    print("State contents:", state)
-
-    # Proceed if it’s a dict-like structure
     user_input = control.get_user_input()
     state["user_params"] = user_input
     return state
 
 def run_sim_node(state: State):
-    print("\nDEBUG: Received state in run_sim_node:")
-    print("Type of state:", type(state))
-    print("State contents:", state)
     params = state["user_params"]
     print(type(params)) # should be dict
     runner.run()
     return state
 
 def notify_complete_node(state: State):
-    print("\nDEBUG: Received state in notify_complete_node:")
-    print("Type of state:", type(state))
-    print("State contents:", state)
     control.notify_sim_complete()
     return state
 
 def get_analysis_question_node(state: State):
-    print("\nDEBUG: Received state in get_analysis_question_node:")
-    print("Type of state:", type(state))
-    print("State contents:", state)
-    # Simulated input for now
     question = "What was the peak infection?"
     state["user_question"] = question
     return state
 
 def analyze_node(state: State):
-    print("\nDEBUG: Received state in analyze_node:")
-    print("Type of state:", type(state))
-    print("State contents:", state)
     # TODO: make these variables, not hard-coded (should be saved to log file)
     analyzer.load_data("agent_states.csv", "infection_events.csv", "model/config.yaml")
-    analyzer.load_column_descriptions("agents/utils/data_desc_dict.yaml")
+    analyzer.load_column_descriptions("utils/dictionaries/data_desc_dict.yaml")
     answer = analyzer.analyze("agent_states.csv", "infection_events.csv", "model/config.yaml", state["user_question"])
     print(f"\nAnalysis Result: {answer}")
     return state, END

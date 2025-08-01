@@ -1,11 +1,10 @@
-"""model.utils.config_loader.py"""
+"""utils.config_loader.py"""
 
 # Import libraries
 import csv
 from datetime import datetime
 import os
 import yaml
-
 
 def load_config(filepath):
     """
