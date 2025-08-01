@@ -16,7 +16,7 @@
     "runs": 5
   },
   "output_directory": "logs",
-  "sim_complete_msg": "Sure, here is a possible way to ask the user:\n\n\"The SIR model simulation has finished. Would you like to proceed with analyzing the results? If yes, please type 'Yes' or 'Analyze Results'. If no, type 'No' or 'Quit'.\"",
+  "sim_complete_msg": "Sure, I can help with that! Here's a message you could use:\n\n\"The simulation of the SIR model has now finished. Would you like to analyze the results? If so, we can provide you with visualizations and statistics about the spread of the disease, such as the final number of infected individuals, the reproduction number (R0), and the duration of the outbreak.\"\n\nYou could also ask the user if they'd prefer any specific visualization or analysis method. For example: \"Would you like to see a graph showing the number of susceptible, infected, and recovered individuals over time? Or perhaps you're interested in seeing how different parameters affect the spread of the disease?\"\n\nBy offering multiple options, you can tailor the analysis to the user's needs and ensure they have a satisfying experience with your model.",
   "last_analysis_question": "What was peak infection?",
   "analysis_result_for_What would you like to analyze? ": "I'm not sure how to answer that yet.",
   "analysis_result_for_What is the population size? ": "I'm not sure how to answer that yet.",

@@ -7,8 +7,8 @@ import logging
 import os
 import random
 
-from simulation.agent import Agent
-from simulation.group import Group
+from model.simulation.agent import Agent
+from model.simulation.group import Group
 
 # Configure logging
 logging.basicConfig(

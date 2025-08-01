@@ -3,21 +3,25 @@
 # Import libraries
 import csv
 from datetime import datetime
+import os
 import yaml
 
 
-def load_config(file_path):
+def load_config(filepath):
     """
     Load configuration from a YAML file.
-
-    Args:
-        file_path (str): Path to the YAML configuration file.
-
-    Returns:
-        dict: Parsed configuration data.
     """
-    with open(file_path, 'r') as f:
-        return yaml.safe_load(f)
+    abs_path = os.path.abspath(filepath)
+
+    if not os.path.exists(abs_path):
+        raise FileNotFoundError(f"YAML config file not found at: {filepath}")
+
+    try:
+        with open(filepath, "r") as f:
+            config = yaml.safe_load(f)
+        return config
+    except yaml.YAMLError as e:
+        raise RuntimeError(f"Error parsing YAML file: {e}")
     
 
 def log_model_params(yaml_dict, section_key, filename=None):

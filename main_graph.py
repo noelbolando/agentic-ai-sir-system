@@ -37,7 +37,7 @@ def run_sim_node(state: State):
     print("State contents:", state)
     params = state["user_params"]
     print(type(params)) # should be dict
-    runner.run(params)
+    runner.run()
     return state
 
 def notify_complete_node(state: State):
@@ -61,9 +61,9 @@ def analyze_node(state: State):
     print("Type of state:", type(state))
     print("State contents:", state)
     # TODO: make these variables, not hard-coded (should be saved to log file)
-    analyzer.load_data("model/agent_states.csv", "model/infection_events.csv", "model/config.yaml")
+    analyzer.load_data("agent_states.csv", "infection_events.csv", "model/config.yaml")
     analyzer.load_column_descriptions("agents/utils/data_desc_dict.yaml")
-    answer = analyzer.analyze("model/agent_states.csv", "model/infection_events.csv", "model/config.yaml", state["user_question"])
+    answer = analyzer.analyze("agent_states.csv", "infection_events.csv", "model/config.yaml", state["user_question"])
     print(f"\nAnalysis Result: {answer}")
     return state, END
 
