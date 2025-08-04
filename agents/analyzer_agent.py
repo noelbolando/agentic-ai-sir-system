@@ -16,7 +16,7 @@ class AnalyzerAgent:
             avg_total = calculate_average_total_infected(self.data)
             results["avg_total_infected"] = (avg_total)
 
-        if "peak" in question:
+        if "peak infected" in question or "peak infection" in question:
             peak, step = calculate_peak_infection(self.data)
             results["peak_infection"] = (peak)
             results["step_of_peak"] = (step)
