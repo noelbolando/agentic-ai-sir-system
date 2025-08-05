@@ -39,6 +39,8 @@ class UIAgent:
             return "run"
         elif "analyze" in user_input.lower():
             return "analyze"
+        elif any(keyword in user_input.lower() for keyword in ["assume", "assumptions", "parameters", "how does", "how does the model", "explain the model"]):
+            return "assumptions"
         elif "exit" in user_input.lower():
             return "exit"
         return "unknown"
