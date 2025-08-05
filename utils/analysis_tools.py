@@ -31,7 +31,7 @@ def calculate_average_total_infected(df: pd.DataFrame) -> dict:
         infected_agents = run_df[run_df["state"] == "I"]["agent_id"].unique()
         infected_totals[run_id] = len(infected_agents)
     avg_infected = round(np.mean(list(infected_totals.values())))
-    return round(avg_infected)
+    return avg_infected
 
 def calculate_peak_infection(df: pd.DataFrame) -> tuple:
     """
@@ -107,3 +107,14 @@ def plot_state_dynamics(df: pd.DataFrame):
         plt.legend()
         plt.tight_layout()
         plt.show()
+
+def calculate_average_infection_time(df: pd.DataFrame) -> int:
+    """
+    Calculates the average duration (in steps) that agents remained infected, based on the all_infection_logs.csv file.
+    """
+    if "duration" not in df.columns:
+        raise ValueError("Expected column 'duration' not found in CSV.")
+
+    avg_duration = int(round(df["duration"].mean()))
+    return avg_duration
+     

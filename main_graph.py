@@ -13,7 +13,7 @@ from agents.reporter_agent import ReporterAgent
 # Initialize agents
 interface = UIAgent()
 runner = ModelAgent()
-analyzer = AnalyzerAgent(logs_path="logs/all_agent_logs.csv")
+analyzer = AnalyzerAgent(state_logs="logs/all_agent_logs.csv", infection_logs="logs/all_infection_logs.csv")
 reporter = ReporterAgent()
 
 # Graph State
