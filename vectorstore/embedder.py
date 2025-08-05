@@ -70,9 +70,9 @@ def build_vectorstore(docs, out_dir):
     print(f"Saved vectorstore to: {out_dir}")
 
 def build_and_save_vectorstores():
-    print("\nEmbedding simulation logs...")
-    csv_docs = load_csv_as_documents(LOGS_DIR)
-    build_vectorstore(csv_docs, VECTORSTORE_LOGS_DIR)
+    #print("\nEmbedding simulation logs...")
+    #csv_docs = load_csv_as_documents(LOGS_DIR)
+    #build_vectorstore(csv_docs, VECTORSTORE_LOGS_DIR)
 
     print("\nEmbedding calculation manual...")
     manual_docs = load_manual_as_documents(MANUAL_PATH)

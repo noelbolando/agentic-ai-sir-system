@@ -26,8 +26,27 @@ def user_input_node(state: State):
     state["user_intent"] = interface.classify_intent(state["user_input"])
     return state
 
+def get_model_parameters_node(state: State):
+    params = interface.get_user_params()
+    state["user_params"] = params
+    return state
+
 def run_model_node(state: State):
-    runner.run()
+    # Default parameters for when no saved ones exist
+    default_params = {
+        "seed": 42,
+        "num_runs": 3,
+        "num_agents": 1000,
+        "num_steps": 28,
+        "num_contacts": 10,
+        "infection_prob": 0.3,
+        "infection_duration": 3,
+        "recovery_prob": 0.1
+    }
+    # Load parameters from file or prompt the user for new ones if none exist
+    params = interface.load_params() or interface.prompt_for_parameters(default_params)
+    # Pass parameters to ModelAgent
+    runner.run(params)
     print("[UI Agent]: Model runs are complete")
     return state
 

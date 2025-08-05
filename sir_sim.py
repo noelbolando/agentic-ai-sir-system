@@ -245,22 +245,34 @@ class Model:
             self.step(step)
 
 # === Main ===
-def main():
+def main(params=None):
     """
     Main function to run the simulation.
     Logging all agent states and infection events per run. 
     """
-    # Load simulation configuration
-    config = load_config("config.yaml")["simulation"]
-    seed = config["seed"]
-    n_runs = 3  # Number of runs (can also be added to the YAML file if needed)
+    if params is None:
+        params = {
+            "seed": 42,
+            "num_runs": 3,
+            "num_agents": 1000,
+            "num_steps": 28,
+            "num_contacts": 10,
+            "infection_prob": 0.3,
+            "infection_duration": 3,
+            "recovery_prob": 0.1
+        }
 
+    # Use the parameters in your simulation logic
+    print(f"Running simulation with parameters: {params}")
+
+    seed = params["seed"]
+    num_runs = params["num_runs"]
     all_agent_state_logs = []
     all_infection_event_logs = []
 
-    for run_id in range(n_runs):
-        env = Environment(config["infection_prob"], config["infection_duration"], config["recovery_prob"])
-        model = Model(config["num_agents"], config["num_steps"], config["num_contacts"], env, seed + run_id, run_id)
+    for run_id in range(num_runs):
+        env = Environment(params["infection_prob"], params["infection_duration"], params["recovery_prob"])
+        model = Model(params["num_agents"], params["num_steps"], params["num_contacts"], env, seed + run_id, run_id)
         model.run()
 
         all_agent_state_logs.extend(model.agent_state_logs)

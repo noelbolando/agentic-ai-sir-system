@@ -20,9 +20,24 @@ Each entry describes how to perform a specific type of calculation using columns
 
 1. We assume perfect mixing in-between agents such that agents are perfectly mixed into groups.
 2. Agents move randomly between groups each during each timestep of the simulation.
-2. Susceptible agents can only become infected by coming in contact with infected agents.
-3. Model parameters are given by the user and they are consistent across model runs.
-4. This is a stochastic which means this model has randomness added to it. This makes the model more realistic.
+3. Susceptible agents can only become infected by coming in contact with infected agents.
+4. Model parameters are given by the user and they are consistent across model runs.
+5. This is a stochastic which means this model has randomness added to it. This makes the model more realistic.
+6. We are not considering reproduction in this model so we do not consider birth rate or death rate. If asked, about this, kindly mention that it is not considered in this model.
+7. No intervention is considered in this model. 
+
+---
+
+## Model Notation
+
+1. Total population is is the total number of agents in our model. This value can be found in params["num_agents"].
+2. Infected at time 0 (S0): in this model, we assume there is one infected agent at time 0.
+3. Recovery rate can be found in params["recovery_prob"].
+4. Total steps per simulation run can be referenced from params["num_step"].
+5. Total simulation runs can be referenced from params["num_runs"].
+6. Agents are organized, exponentially, into groups. Mean group sizes can be referneced from params["num_contacts"].
+7. The probability of infection can be referneced from params["infection_prob"].
+8. Similarly, infection rate can be calcualted by multiplying the number of contacts times the infection probability.
 
 ---
 
@@ -78,28 +93,6 @@ Steps:
 4. For each `run_id`, track which `step` occurs most frequently for the maximum count of I.
 5. Return the most frequently occuring step(s).
 
-Example:
-run_id: 1
-step 0: 10 infected
-step 1: 22 infected ← peak
-step 2: 19 infected
-
-run_id: 2
-step 0: 9 infected
-step 1: 20 infected ← peak
-step 2: 18 infected
-
-run_id: 3
-step 0: 11 infected
-step 1: 20 infected
-step 2: 21 infected ← peak
-
-In this example, the data for runs 1 and 2 indicates that the peak infection occured at step 1 for both runs. 
-In run 3, the peak infection occured at step 2.
-This means that peak infection occured at step 1 for run 1 and run 2. It occured at step 2 for run 3.
-Thus, the most frequent steps where peak infection occured would be step 1.
-The correct answer would be step 1.
-
 ---
 
 3. How to Detect What the Peak Infection Number Was
@@ -135,20 +128,6 @@ run_id: 3
 step 0: 11 infected
 step 1: 20 infected
 step 2: 21 infected ← peak
-
-In this example, the data for run 1 indicates that the maximum infection event occured at step 1 with 22 infected agents.
-The data for run 2 indicates that the maximum infection event occured at step 1 with 20 infected agents.
-The data for run 3 indicates that the maximum infection event occured at step 2 with 21 infected agents.
-Thus, the sum of maximum infected agents is: 22 + 20 + 21 = 63
-You have 3 runs.
-So, the average number of infected agents is: 63/3 = 21
-Thus, the peak infection amount was 21 agents.
-The correct answer would be 21 infected agnents. 
-
-Note: if this final answer has a decimal place, such as: 21.4, please round the answer.
-Example: 
-- 21.4 would round to 21.
-- 21.5 would round to 22.
 
 ---
 

@@ -3,6 +3,6 @@
 from sir_sim import main
 
 class ModelAgent:
-    def run(self):
-        main()
+    def run(self, params):
+        main(params)
     
