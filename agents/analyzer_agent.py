@@ -6,7 +6,8 @@ from utils.analysis_tools import (
     calculate_average_total_infected, 
     calculate_peak_infection_std, 
     plot_state_dynamics,
-    calculate_average_infection_time
+    calculate_average_infection_time,
+    calculate_outbreak_resolution_timing
 )
 
 class AnalyzerAgent:
@@ -21,9 +22,9 @@ class AnalyzerAgent:
         question = question.lower()
         results = {}
 
-        if "how many" in question or "total infected" in question:
+        if "how many" in question and "infected" in question:
             avg_total = calculate_average_total_infected(self.state_data)
-            results["avg_total_infected"] = {"total infected": avg_total}
+            results["avg_total_infected"] = (avg_total)
 
         if "peak infected" in question or "peak infection" in question:
             peak, step = calculate_peak_infection(self.state_data)
@@ -41,5 +42,12 @@ class AnalyzerAgent:
         if "how long" in question.lower() or "duration" in question.lower() or "infection time" in question.lower():
             avg_duration = calculate_average_infection_time(self.infection_data)
             results["avg_infection_duration"] = {"average duration": avg_duration}
+
+        if "outbreak" in question.lower() and "over" in question.lower() or "end" in question.lower():
+            resolution = calculate_outbreak_resolution_timing(self.state_data)
+            results["outbreak_timing"] = {
+                "peak_infection_step": resolution.get("avg_peak_step"),
+                "clearance_step": resolution.get("avg_clearance_step")
+            }
 
         return results
