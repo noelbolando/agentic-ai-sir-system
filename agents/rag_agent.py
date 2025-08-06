@@ -97,8 +97,11 @@ class RAGAgent:
 
         # Prompt with context injection
         self.prompt = ChatPromptTemplate.from_template(
-            """You are a helpful AI agent analyzing epidemic simulation data.
+            """You are an expert infectious disease AI agent, tasked with the responsibility of analyzing epidemic simulation data.
             Use the following context to answer the user's question.
+
+            Please answer in a concise and friendly manner, as if you were speaking to a general audience.
+            Your goal is to educate and expand understanding so please present your language in a way that aligns with this goal.
 
             Context: {context}
 

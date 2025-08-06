@@ -1,39 +1,48 @@
 # agents.ui_agent.py
 
+import getpass
 import json
 
 from utils.llm_utils import OllamaLLM
 
+# Get username
+username = getpass.getuser()
+
 class UIAgent:
-    def __init__(self, model="mistral", test_mode=False, params_file="utils/params.json"):
+    def __init__(
+            self, 
+            model="mistral", 
+            test_mode=False, 
+            params_file="utils/params.json"
+        ):
         self.llm = OllamaLLM(model)
         self.test_mode = test_mode
         self.params_file = params_file
     
     def get_user_input(self):
-        user_input = input("\n [UI Agent]: What would you like to do?\n> ")
+        user_input = input(f"\n [UI Agent]: Hello, {username}, how can I help you today?\n> ")
         return user_input
 
     def classify_intent(self, user_input: str) -> str:
-        """
-        Classifies the intent of the user prompt.
-        
-        States:
-            Run: run the simulation
-            Analyze: analyze the results of the simulation
-
-        """
+        """Classifies the intent of the user prompt."""
         prompt = f"""
-        You are a helpful assistant. A user has entered the following message:
+        You are a assistant AI Agent, tasked with the goal of answer user questions in an empathetic and professional manner.
+        You must determine the users needs based on their input message. 
+        A user has entered the following message:
 
         "{user_input}"
 
         Determine whether the user is trying to:
         - 'run' a simulation
         - 'analyze' the results
-        - or something else (return 'unknown')
+        - 'learn' about model 'assumptions'
+        - 'exit' the model
+        - or something else
 
-        Respond with only one word: 'run', 'analyze', 'exit', or 'unknown'.
+        If the user message is unclear, please prompt them to try another request.
+        Your goal is to educate and expand understanding so please present your language in a way that aligns with this goal.
+
+        Respond with only one word: 'run', 'analyze', 'exit', 'learn', or 'unknown'.
         """
         intent = self.llm.generate(prompt).strip().lower()
         if intent in ["run", "analyze"]:
@@ -42,23 +51,25 @@ class UIAgent:
             return "run"
         elif "analyze" in user_input.lower():
             return "analyze"
-        elif any(keyword in user_input.lower() for keyword in ["assume", "assumptions", "parameters", "how does", "how does the model", "explain the model"]):
-            return "assumptions"
+        elif any(keyword in user_input.lower() for keyword in ["learn about model", "assumptions", "parameters", "how does", "how does the model", "explain the model"]):
+            return "learn"
         elif "exit" in user_input.lower():
             return "exit"
         return "unknown"
 
     def ask_analysis_question(self) -> str:
         """Prompt the user for a specific analysis question."""
-        return input("\n [UI Agent]: What would you like to analyze?\n> ")
+        return input("\n [UI Agent]: Sure, I can help with that. What would you like to know?\n> ")
 
     def follow_up(self, message: str) -> str:
+        """Respond with a follow-up response to the user request based on the incoming message."""
         prompt = f"""
+        You are a assistant AI Agent, tasked with the goal of answer user questions in an empathetic and professional manner.
         The following message should be displayed to the user:
 
         "{message}"
 
-        Write a user-friendly version of this to display back to them.
+        Please write a user-friendly version of this to display back to them. Keep it concise.
         """
         return self.llm.generate(prompt)
     
@@ -69,7 +80,7 @@ class UIAgent:
                 params = json.load(file)
             return params
         except FileNotFoundError:
-            return None  # No params file exists, return None.
+            return None
 
     def save_params(self, params):
         """Save the parameters to the params.json file."""
@@ -82,18 +93,34 @@ class UIAgent:
         if not model_params:
             return default_value
         try:
-            return value_type(model_params)  # Convert the input to the appropriate type.
+            return value_type(model_params)
         except ValueError:
             print(f"Invalid input, using default: {default_value}")
             return default_value
 
     def prompt_for_parameters(self, default_params):
         """Prompt the user for parameters, and return validated ones."""
-        print("Would you like to use the default parameters or enter new ones?")
-        use_defaults = input("Enter 'yes' to use default, or 'no' to enter custom parameters: ").lower()
+        prompt = """
+        You are a assistant AI Agent, tasked with the goal of answer user questions in an empathetic and professional manner.
+        You are tasked to ask the user if they would like to run an infectious disease model with default parameters or if they would like to enter their own parameters.
+
+        The default parameters are: 
+            num_runs: 3
+            num_agents: 100
+            num_steps: 28
+            num_contacts: 5
+            infection_prob: 0.1
+            infection_duration: 3.0
+            recovery_prob: 0.3
+
+        Please share this information with the user and learn how they would like tp proceed.
+        Keep it concise.
+        
+        """
+        use_defaults = input("Enter 'yes' to use default parameters").lower()
 
         if use_defaults == 'yes' or not use_defaults:
-            print("Using default parameters.")
+            print("Thanks, default parameters.")
             return default_params
 
         # Prompt for each parameter
