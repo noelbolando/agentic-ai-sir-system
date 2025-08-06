@@ -45,7 +45,7 @@ class UIAgent:
         Respond with only one word: 'run', 'analyze', 'exit', 'learn', or 'unknown'.
         """
         intent = self.llm.generate(prompt).strip().lower()
-        if intent in ["run", "analyze"]:
+        if intent in ["run", "analyze", "learn", "model"]:
             return intent
         elif "run" in user_input.lower():
             return "run"
@@ -61,17 +61,35 @@ class UIAgent:
         """Prompt the user for a specific analysis question."""
         return input("\n [UI Agent]: Sure, I can help with that. What would you like to know?\n> ")
 
-    def follow_up(self, message: str) -> str:
-        """Respond with a follow-up response to the user request based on the incoming message."""
+    def follow_up(self):
+        """Conditional edge function for directing user follow-up questions."""
+        user_follow_up = input(f"\n [UI Agent]: Is there anything else I can help you with?\n> ")
+        return user_follow_up
+    
+    def classify_followup(self, follow_up: str) -> str:
+        """Classify the user's follow-up response. Used after the system asks: 'Is there anything else I can help you with?'"""
         prompt = f"""
-        You are a assistant AI Agent, tasked with the goal of answer user questions in an empathetic and professional manner.
-        The following message should be displayed to the user:
+        A user has responded with the following message:
 
-        "{message}"
+        "{follow_up}"
 
-        Please write a user-friendly version of this to display back to them. Keep it concise.
+        Determine whether this means they:
+        - want to continue interacting and return to the user_input node (respond with 'yes')
+        - want to stop the session (respond with 'no')
+        - or are unclear (respond with 'unknown')
+
+        Respond with only one word: 'yes', 'no', 'exit', or 'unknown'.
         """
-        return self.llm.generate(prompt)
+        followup_intent= self.llm.generate(prompt).strip().lower()
+
+        if followup_intent in ["yes", "y", "sure", "yeah", "no", "n"]:
+            return followup_intent
+        elif any(keyword in followup_intent.lower() for keyword in ["yes", "y", "sure", "yeah"]):
+            return "yes"
+        elif any(keyword in followup_intent.lower() for keyword in ["no", "n", "exit", "quit"]):
+            return "exit"
+        else:
+            return "unknown"
     
     def load_params(self):
         """Load the parameters from the file if they exist."""

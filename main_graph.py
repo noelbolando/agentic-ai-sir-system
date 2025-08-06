@@ -80,9 +80,9 @@ def fallback_node(state: State):
 def route_by_intent(state: State) -> str:
     return state["user_intent"]
 
-def anything_else_node(state: State):
-    followup = input("[UI Agent]: Is there anything else I can help you with? (yes/no): ").strip().lower()
-    state["followup_response"] = followup
+def follow_up_node(state: State):
+    state["follow_up"] = interface.follow_up()
+    state["user_intent"] = interface.classify_followup(state["follow_up"])
     return state
 
 def exit_node(state: State):
@@ -99,8 +99,8 @@ graph_builder.add_node("ask_analysis_question", ask_analysis_question_node)
 graph_builder.add_node("analyze", analyze_node)
 graph_builder.add_node("report_results", report_results_node)
 graph_builder.add_node("ask_assumption_question", ask_assumption_question_node)
+graph_builder.add_node("follow_up", follow_up_node)
 graph_builder.add_node("fallback", fallback_node)
-graph_builder.add_node("anything_else", anything_else_node)
 graph_builder.add_node("exit", exit_node)
 
 # Build transitions
@@ -120,19 +120,21 @@ graph_builder.add_conditional_edges(
 )
 
 graph_builder.add_conditional_edges(
-    "anything_else",
-    anything_else_node,
+    "follow_up",
+    route_by_intent,
     {
-        "user_input": "user_input", 
-        "exit": "exit"
+        "yes": "user_input",
+        "no": "exit",
+        "unknown": "fallback"
     }
 )
+
 
 graph_builder.add_edge("run_model", "user_input")
 graph_builder.add_edge("ask_analysis_question", "analyze")
 graph_builder.add_edge("analyze", "report_results")
-graph_builder.add_edge("report_results", "anything_else") 
-graph_builder.add_edge("ask_assumption_question", "anything_else")
+graph_builder.add_edge("report_results", "follow_up") 
+graph_builder.add_edge("ask_assumption_question", "follow_up")
 graph_builder.add_edge("fallback", "user_input")
 
 graph_builder.set_finish_point("exit")
