@@ -34,7 +34,7 @@ def get_model_parameters_node(state: State):
 def run_model_node(state: State):
     default_params = {
         "seed": 42,
-        "num_runs": 3,
+        "num_runs": 100,
         "num_agents": 1000,
         "num_steps": 28,
         "num_contacts": 10,

@@ -241,7 +241,6 @@ class Model:
         """Run the simulation and log SIR counts."""
         for step in range(self.num_steps):
             self.step(step)
-            print(f"running step {step}")
 
 # === Main ===
 def main(params):
@@ -254,7 +253,6 @@ def main(params):
 
     print("Starting main simulation loop")
     for run_id in range(params["num_runs"]):
-        print(f"Starting run {run_id}")
         env = Environment(params["infection_prob"], params["infection_duration"], params["recovery_prob"])
         model = Model(params["num_agents"], params["num_steps"], params["num_contacts"], env, params["seed"] + run_id, run_id)
         model.run()
@@ -271,7 +269,7 @@ def main(params):
 if __name__ == "__main__":
     default_params = {
         "seed": 42,
-        "num_runs": 3,
+        "num_runs": 100,
         "num_agents": 1000,
         "num_steps": 28,
         "num_contacts": 10,

@@ -71,6 +71,7 @@ class UIAgent:
     def classify_followup(self, follow_up: str) -> str:
         """Classify the user's follow-up response. Used after the system asks: 'Is there anything else I can help you with?'"""
         prompt = f"""
+        You are a assistant AI Agent, tasked with the goal of interpreting user needs.
         A user has responded with the following message:
 
         "{follow_up}"
@@ -123,11 +124,11 @@ class UIAgent:
         params_choice = input("[UI Agent]: Would you prefer to use the default parameters or enter your own? ").lower()
 
         if any(keyword in params_choice.lower() for keyword in ["default", "default parameters"]):
-            print("[UI Agent]: Thanks, using the default parameters to run the simulation!")
+            print("\n[UI Agent]: Thanks, using the default parameters to run the simulation!")
             new_params = default_params
         else:
             # Prompt for each parameter
-            print("Please enter the following parameters:")
+            print("[UI Agent]: Please enter the following parameters:")
             num_runs = self.get_user_params("Number of runs", default_params["num_runs"], int)
             num_agents = self.get_user_params("Number of agents", default_params["num_agents"], int)
             num_steps = self.get_user_params("Number of steps", default_params["num_steps"], int)
