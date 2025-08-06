@@ -70,7 +70,7 @@ def report_results_node(state: State):
 def ask_assumption_question_node(state: State):
     question = state["user_input"]
     response = rag.answer(question)
-    print(f"[UI Agent]: {response}")
+    print(f"[RAG Agent]: {response}")
     return state
 
 def fallback_node(state: State):
@@ -106,6 +106,7 @@ graph_builder.add_node("exit", exit_node)
 # Build transitions
 graph_builder.set_entry_point("user_input")
 
+# Conditional for Control Agent to handle task assignment
 graph_builder.add_conditional_edges(
     "user_input",
     route_by_intent,
@@ -119,6 +120,7 @@ graph_builder.add_conditional_edges(
     }
 )
 
+# Conditional for follow-up to guide interactions
 graph_builder.add_conditional_edges(
     "follow_up",
     route_by_intent,

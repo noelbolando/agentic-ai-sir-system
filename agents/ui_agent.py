@@ -2,6 +2,7 @@
 
 import getpass
 import json
+import yaml
 
 from utils.llm_utils import OllamaLLM
 
@@ -13,11 +14,12 @@ class UIAgent:
             self, 
             model="mistral", 
             test_mode=False, 
-            params_file="utils/params.json"
+            params_file="params.yaml"
         ):
         self.llm = OllamaLLM(model)
         self.test_mode = test_mode
         self.params_file = params_file
+        self.params = self.load_params()
     
     def get_user_input(self):
         user_input = input(f"\n [UI Agent]: Hello, {username}, how can I help you today?\n> ")
@@ -92,18 +94,17 @@ class UIAgent:
             return "unknown"
     
     def load_params(self):
-        """Load the parameters from the file if they exist."""
+        """Load the parameters from YAML file if they exist."""
         try:
-            with open(self.params_file, 'r') as file:
-                params = json.load(file)
-            return params
+            with open(self.params_file, "r") as file:
+                return yaml.safe_load(file) or {}
         except FileNotFoundError:
-            return None
+            return {}
 
-    def save_params(self, params):
-        """Save the parameters to the params.json file."""
-        with open(self.params_file, 'w') as file:
-            json.dump(params, file, indent=4)
+    def save_params(self):
+        """Save the parameters to the YAML file."""
+        with open(self.params_file, "w") as file:
+            yaml.dump(self.params, file, default_flow_style=False)
 
     def get_user_params(self, prompt, default_value, value_type):
         """Get user input and validate it."""
@@ -118,53 +119,36 @@ class UIAgent:
 
     def prompt_for_parameters(self, default_params):
         """Prompt the user for parameters, and return validated ones."""
-        prompt = """
-        You are a assistant AI Agent, tasked with the goal of answer user questions in an empathetic and professional manner.
-        You are tasked to ask the user if they would like to run an infectious disease model with default parameters or if they would like to enter their own parameters.
+        print("\n[UI Agent]: Sure, I can help you with that.")
+        params_choice = input("[UI Agent]: Would you prefer to use the default parameters or enter your own? ").lower()
 
-        The default parameters are: 
-            num_runs: 3
-            num_agents: 100
-            num_steps: 28
-            num_contacts: 5
-            infection_prob: 0.1
-            infection_duration: 3.0
-            recovery_prob: 0.3
+        if any(keyword in params_choice.lower() for keyword in ["default", "default parameters"]):
+            print("[UI Agent]: Thanks, using the default parameters to run the simulation!")
+            return 
+        else:
+            # Prompt for each parameter
+            print("Please enter the following parameters:")
+            num_runs = self.get_user_params("Number of runs", default_params["num_runs"], int)
+            num_agents = self.get_user_params("Number of agents", default_params["num_agents"], int)
+            num_steps = self.get_user_params("Number of steps", default_params["num_steps"], int)
+            num_contacts = self.get_user_params("Number of contacts per step", default_params["num_contacts"], int)
+            infection_prob = self.get_user_params("Infection probability", default_params["infection_prob"], float)
+            infection_duration = self.get_user_params("Infection duration (in steps)", default_params["infection_duration"], int)
+            recovery_prob = self.get_user_params("Recovery probability", default_params["recovery_prob"], float)
 
-        Please share this information with the user and learn how they would like tp proceed.
-        Keep it concise.
-        
-        """
-        use_defaults = input("Enter 'yes' to use default parameters").lower()
+            # Create a dictionary of the parameters
+            new_params = {
+                "seed": 42,  # Fixed seed
+                "num_runs": num_runs,
+                "num_agents": num_agents,
+                "num_steps": num_steps,
+                "num_contacts": num_contacts,
+                "infection_prob": infection_prob,
+                "infection_duration": infection_duration,
+                "recovery_prob": recovery_prob
+            }
 
-        if use_defaults == 'yes' or not use_defaults:
-            print("Thanks, default parameters.")
-            return default_params
-
-        # Prompt for each parameter
-        print("Please enter the following parameters:")
-
-        num_runs = self.get_user_params("Number of runs", default_params["num_runs"], int)
-        num_agents = self.get_user_params("Number of agents", default_params["num_agents"], int)
-        num_steps = self.get_user_params("Number of steps", default_params["num_steps"], int)
-        num_contacts = self.get_user_params("Number of contacts per step", default_params["num_contacts"], int)
-        infection_prob = self.get_user_params("Infection probability", default_params["infection_prob"], float)
-        infection_duration = self.get_user_params("Infection duration (in steps)", default_params["infection_duration"], int)
-        recovery_prob = self.get_user_params("Recovery probability", default_params["recovery_prob"], float)
-
-        # Create a dictionary of the parameters
-        new_params = {
-            "seed": 42,  # Fixed seed
-            "num_runs": num_runs,
-            "num_agents": num_agents,
-            "num_steps": num_steps,
-            "num_contacts": num_contacts,
-            "infection_prob": infection_prob,
-            "infection_duration": infection_duration,
-            "recovery_prob": recovery_prob
-        }
-
-        # Save the new parameters to the file
-        self.save_params(new_params)
+            # Save the new parameters to the file
+            self.save_params(new_params)
 
         return new_params
