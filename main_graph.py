@@ -80,6 +80,11 @@ def fallback_node(state: State):
 def route_by_intent(state: State) -> str:
     return state["user_intent"]
 
+def anything_else_node(state: State):
+    followup = input("[UI Agent]: Is there anything else I can help you with? (yes/no): ").strip().lower()
+    state["followup_response"] = followup
+    return state
+
 def exit_node(state: State):
     print("[UI Agent]: Exiting the program. Goodbye!")
     sys.exit(0)
@@ -95,6 +100,7 @@ graph_builder.add_node("analyze", analyze_node)
 graph_builder.add_node("report_results", report_results_node)
 graph_builder.add_node("ask_assumption_question", ask_assumption_question_node)
 graph_builder.add_node("fallback", fallback_node)
+graph_builder.add_node("anything_else", anything_else_node)
 graph_builder.add_node("exit", exit_node)
 
 # Build transitions
@@ -112,11 +118,21 @@ graph_builder.add_conditional_edges(
         "unknown": "fallback"
     }
 )
+
+graph_builder.add_conditional_edges(
+    "anything_else",
+    anything_else_node,
+    {
+        "user_input": "user_input", 
+        "exit": "exit"
+    }
+)
+
 graph_builder.add_edge("run_model", "user_input")
 graph_builder.add_edge("ask_analysis_question", "analyze")
 graph_builder.add_edge("analyze", "report_results")
-graph_builder.add_edge("report_results", "user_input") 
-graph_builder.add_edge("ask_assumption_question", "user_input")
+graph_builder.add_edge("report_results", "anything_else") 
+graph_builder.add_edge("ask_assumption_question", "anything_else")
 graph_builder.add_edge("fallback", "user_input")
 
 graph_builder.set_finish_point("exit")
