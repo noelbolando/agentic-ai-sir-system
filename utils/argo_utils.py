@@ -3,7 +3,7 @@ import requests
 
 # Configuration
 BASE_URL = "http://localhost:62898"  # Update if your server is running on a different host/port
-CHAT_ENDPOINT = f"{BASE_URL}/v1/chat"
+CHAT_ENDPOINT = f"{BASE_URL}/v1/chat/completions"
 MODEL = "argo:gpt-4o"
 
 # Test Case: Successful Chat Request with Messages
@@ -13,7 +13,7 @@ print("Running Chat Test with Messages")
 payload = {
     "model": MODEL,
     "prompt": ["Tell me something interesting about quantum mechanics. longer passage"],
-    "user": "test_user",  # This will be overridden by the proxy_request function
+    "user": "nboland",
 }
 headers = {"Content-Type": "application/json"}
 
