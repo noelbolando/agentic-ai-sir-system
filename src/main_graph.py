@@ -14,7 +14,7 @@ from agents.reporter_agent import ReporterAgent
 # Initialize agents
 interface = UIAgent()
 runner = ModelAgent()
-analyzer = AnalyzerAgent(state_logs="logs/all_agent_logs.csv")
+analyzer = AnalyzerAgent(state_logs="src/logs/all_agent_logs.csv")
 rag = RAGAgent()
 reporter = ReporterAgent()
 

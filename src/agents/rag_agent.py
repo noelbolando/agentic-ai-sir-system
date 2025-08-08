@@ -77,7 +77,7 @@ from langchain_core.runnables import Runnable
 class RAGAgent:
     def __init__(
             self,
-            manuals_store_dir="vectorstore/faiss_store_manuals"
+            manuals_store_dir="src/vectorstore/faiss_store_manuals"
         ):
 
         self.embeddings = OllamaEmbeddings(model="nomic-embed-text")

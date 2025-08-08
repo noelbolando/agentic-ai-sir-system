@@ -262,7 +262,7 @@ def main(params):
     # Convert to DataFrames
     agent_df = pd.DataFrame(all_agent_state_logs)
     # Convert to csv
-    agent_df.to_csv("logs/all_agent_logs.csv", index=False)
+    agent_df.to_csv("src/logs/all_agent_logs.csv", index=False)
 
     return
 
