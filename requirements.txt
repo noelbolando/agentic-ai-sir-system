@@ -1,0 +1,12 @@
+datasets
+fastapi
+langchain
+langchain-community
+langgraph
+matplotlib
+pandas
+peft
+requests
+torch
+transformers
+uvicorn

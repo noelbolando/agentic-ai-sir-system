@@ -1,0 +1,5 @@
+[
+    {"user_input": "What does the SIR curve look like?", "action": "plot_state_dynamics"},
+    {"user_input": "When did the peak infection occur?", "action": "calculate_peak_infection"},
+    {"user_input": "How many agents are infected?", "action": "calculate_average_total_infected"}
+]
