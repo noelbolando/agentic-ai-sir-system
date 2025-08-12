@@ -2,9 +2,10 @@
 
 """
 This script embeds a FAISS vectorstore with:
-- Simulation log data (CSV rows)
-- Calculation manual (plain text)
-Stores are saved seperately to support fine-tuned retrieval.
+- SIR Model Inforamtion (markdown language)
+
+The script chunks the data based on markdown syntax such as title: (#), header (##), and sub-header (###) symbols.
+It then embeds the FAISS vectorstore with the data such that the RAG agent can retrieve it to help answer user questions.
 """
 
 # Import libraries 
@@ -19,36 +20,8 @@ from langchain.schema import Document
 # Paths for retrieving and augmenting files to the vectorstore
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOGS_DIR = os.path.normpath(os.path.join(BASE_DIR, "..", "logs"))
-MANUAL_PATH = os.path.normpath(os.path.join(BASE_DIR, "..", "knowledge", "calculation_manual.txt"))
+MANUAL_PATH = os.path.normpath(os.path.join(BASE_DIR, "..", "knowledge", "sir_model_information.md"))
 VECTORSTORE_MANUALS_DIR = os.path.join(BASE_DIR, "faiss_store_manuals")
-
-# Loader functions
-def load_csv_as_documents(logs_dir):
-    docs = []
-    if not os.path.exists(logs_dir):
-        raise FileNotFoundError(f"Logs directory not found: {logs_dir}")
-
-    for filename in os.listdir(logs_dir):
-        if filename.endswith(".csv"):
-            filepath = os.path.join(logs_dir, filename)
-            print(f"Grouping and loading {filepath}...")
-            df = pd.read_csv(filepath)
-            
-            # Group rows by run_id and step
-            grouped = df.groupby(['run_id', 'step'])
-            for (run_id, step), group_df in grouped:
-                # Turn entire group into one text blob
-                row_texts = [
-                    ", ".join(f"{col}: {val}" for col, val in row.items())
-                    for _, row in group_df.iterrows()
-                ]
-                page_content = f"Run ID: {run_id}, Step: {step}\n" + "\n".join(row_texts)
-                doc = Document(
-                    page_content=page_content,
-                    metadata={"run_id": run_id, "step": step, "source": filename}
-                )
-                docs.append(doc)
-    return docs
 
 def load_manual_as_documents(path):
     """Load knowledge manual as document"""
@@ -60,7 +33,7 @@ def load_manual_as_documents(path):
 
 # Builder functions
 def build_vectorstore(docs, out_dir):
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=50)
     split_docs = splitter.split_documents(docs)
     embedding = OllamaEmbeddings(model="nomic-embed-text")
     vectorstore = FAISS.from_documents(split_docs, embedding)
@@ -69,10 +42,6 @@ def build_vectorstore(docs, out_dir):
     print(f"Saved vectorstore to: {out_dir}")
 
 def build_and_save_vectorstores():
-    #print("\nEmbedding simulation logs...")
-    #csv_docs = load_csv_as_documents(LOGS_DIR)
-    #build_vectorstore(csv_docs, VECTORSTORE_LOGS_DIR)
-
     print("\nEmbedding calculation manual...")
     manual_docs = load_manual_as_documents(MANUAL_PATH)
     build_vectorstore(manual_docs, VECTORSTORE_MANUALS_DIR)

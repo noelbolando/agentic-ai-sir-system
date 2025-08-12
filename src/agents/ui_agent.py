@@ -71,28 +71,37 @@ class UIAgent:
     def classify_followup(self, follow_up: str) -> str:
         """Classify the user's follow-up response. Used after the system asks: 'Is there anything else I can help you with?'"""
         prompt = f"""
-        You are a assistant AI Agent, tasked with the goal of interpreting user needs.
-        A user has responded with the following message:
+        You are a assistant AI Agent, tasked with the goal of answer user questions in an empathetic and professional manner.
+        You must determine the users needs based on their input message. 
+        A user has entered the following message:
 
         "{follow_up}"
 
-        Determine whether this means they:
-        - want to continue interacting and return to the user_input node (respond with 'yes')
-        - want to stop the session (respond with 'no')
-        - or are unclear (respond with 'unknown')
+        Determine whether the user is trying to:
+        - 'run' a simulation
+        - 'analyze' the results
+        - 'learn' about model 'assumptions'
+        - 'exit' the model
+        - or something else
 
-        Respond with only one word: 'yes', 'no', 'exit', or 'unknown'.
+        If the user message is unclear, please prompt them to try another request.
+        Your goal is to educate and expand understanding so please present your language in a way that aligns with this goal.
+
+        Respond with only one word: 'run', 'analyze', 'exit', 'learn', or 'unknown'.
         """
-        followup_intent= self.llm.generate(prompt).strip().lower()
-
-        if followup_intent in ["yes", "y", "sure", "yeah", "no", "n"]:
+        
+        followup_intent = self.llm.generate(prompt).strip().lower()
+        if followup_intent in ["run", "analyze", "learn", "model"]:
             return followup_intent
-        elif any(keyword in followup_intent.lower() for keyword in ["yes", "y", "sure", "yeah"]):
-            return "yes"
-        elif any(keyword in followup_intent.lower() for keyword in ["no", "n", "exit", "quit"]):
+        elif "run" in follow_up.lower():
+            return "run"
+        elif "analyze" in follow_up.lower():
+            return "analyze"
+        elif any(keyword in follow_up.lower() for keyword in ["learn about model", "assumptions", "parameters", "how does", "how does the model", "explain the model"]):
+            return "learn"
+        elif "exit" in follow_up.lower():
             return "exit"
-        else:
-            return "unknown"
+        return "unknown"
     
     def load_params(self):
         """Load the parameters from YAML file if they exist."""
@@ -109,7 +118,7 @@ class UIAgent:
 
     def get_user_params(self, prompt, default_value, value_type):
         """Get user input and validate it."""
-        model_params = input(f"{prompt} (default {default_value}): ")
+        model_params = input(f"{prompt}: ")
         if not model_params:
             return default_value
         try:
@@ -120,15 +129,19 @@ class UIAgent:
 
     def prompt_for_parameters(self, default_params):
         """Prompt the user for parameters, and return validated ones."""
-        print("\n[UI Agent]: Sure, I can help you with that.")
-        params_choice = input("[UI Agent]: Would you prefer to use the default parameters or enter your own? ").lower()
+        print("\n[UI Agent]: Sure, I can help you with that. Here are the default parameters:")
+    
+        for key, value in default_params.items():
+            print(f"{key}: {value}")
+        
+        params_choice = input("\n[UI Agent]: Would you prefer to use the default parameters or enter your own? ").lower()
 
         if any(keyword in params_choice.lower() for keyword in ["default", "default parameters"]):
             print("\n[UI Agent]: Thanks, using the default parameters to run the simulation!")
             new_params = default_params
         else:
             # Prompt for each parameter
-            print("[UI Agent]: Please enter the following parameters:")
+            print("[UI Agent]: Okay, please enter the following parameters:")
             num_runs = self.get_user_params("Number of runs", default_params["num_runs"], int)
             num_agents = self.get_user_params("Number of agents", default_params["num_agents"], int)
             num_steps = self.get_user_params("Number of steps", default_params["num_steps"], int)

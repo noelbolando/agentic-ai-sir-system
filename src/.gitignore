@@ -1,4 +1,4 @@
-logs
+logs/all_agent_logs.csv
 vectorstore/faiss_store_manuals
 utils/__pycache__
 agents/__pycache__
