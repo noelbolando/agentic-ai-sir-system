@@ -53,7 +53,7 @@ def run_search(collection, data, output_fields, limit: int):
     # Data to be sent as a POST in JSON format
     data = {
         "collectionName": collection,
-        "vector": data[0],
+        "vector": data,
         "annsField": "text_vector",
         "outputFields": output_fields,
         "limit": limit,

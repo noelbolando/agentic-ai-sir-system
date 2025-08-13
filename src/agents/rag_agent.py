@@ -7,16 +7,19 @@ RAG agent is responsible for:
 3. sending the prompt to an LLM
 """
 
+# Import libraries
+import json as std_json
+import numpy as np
 # Import dependencies
 from utils.argo_utils import run_chat, run_embeddings, run_search
 
 class RAGAgent:
     def __init__(
-            self,
-            collection_name="sir_collections",
-            output_fields=["page_content"],
-            limit=5
-        ):
+        self,
+        collection_name="sir_collections",
+        output_fields=["page_content"],
+        limit=5
+    ):
         self.collection_name = collection_name
         self.output_fields = output_fields
         self.limit = limit
@@ -24,65 +27,80 @@ class RAGAgent:
         self.embedding_model = "v3large"
         self.chat_model = "gpt4o"
 
-        # Prompt with context injection
         self.instructions = """
         You are an expert infectious disease AI agent, tasked with the responsibility of analyzing epidemic simulation data.
         Use the following context to answer the user's question.
 
         Please answer in a concise and friendly manner, as if you were speaking to a general audience.
-        Your goal is to educate and expand understanding so please present your language in a way that aligns with this goal.
+        Your goal is to educate and expand understanding, so keep it clear, engaging, and smart.
         """
 
     def generate_embeddings(self, text: str):
         """Generate embeddings using Argo API."""
-        print(f"Generating embeddings for text: {text}")  # Debugging input
+
+        print(f"[DEBUG] Generating embeddings for input: {text}")
         embeddings = run_embeddings(model=self.embedding_model, prompts=[text])
-        print(f"Embedding response: {embeddings}")  # Debugging response structure
-        if embeddings and "embedding" in embeddings:
-            return embeddings["embedding"]
-        else:
-            print(f"Embedding generation failed. Response: {embeddings}")  # Debugging response
-            raise ValueError("Failed to generate embeddings.")
+
+        # Normalize expected structure
+        if isinstance(embeddings, dict) and "embedding" in embeddings:
+            vec = embeddings["embedding"]
+            print(f"[DEBUG] Received vector (dict): dim={len(vec[0])}")
+            return vec[0]
+
+        elif isinstance(embeddings, list) and isinstance(embeddings[0], list):
+            print(f"[DEBUG] Received vector (list): dim={len(embeddings[0])}")
+            return embeddings[0]
+
+        raise ValueError(f"[ERROR] Unexpected embedding format: {embeddings}")
 
     def search_documents(self, vector):
         """Search for relevant documents in Milvus using Argo API."""
+        vector = np.array(vector, dtype=np.float32).tolist()
+        print(f"[DEBUG] Searching Milvus with vector of dim: {len(vector)}")
+
         results = run_search(
             collection=self.collection_name,
             data=vector,
             output_fields=self.output_fields,
             limit=self.limit
         )
-        print(f"Type of vector: {type(vector)}, Length: {len(vector)}")
-        print(f"Search results raw output: {results}")
-        if results and "results" in results:
-            return [result["page_content"] for result in results["results"]]
+
+        if results and "data" in results:
+            return [r.get("text_content") for r in results["data"] if r.get("text_content")]
+            print(f"[DEBUG] Retrieved {len(docs)} document(s)")
+            return docs
         else:
-            raise ValueError("Failed to retrieve documents.")
+            raise ValueError(f"[ERROR] Failed to retrieve documents. Got: {results}")
 
     def generate_response(self, context: str, question: str):
-        """Generate response using Argo chat API."""
+        """Generate natural language answer using Argo chat API."""
+        prompt = f"Context:\n{context}\n\nQuestion:\n{question}"
+        print(f"[DEBUG] Sending prompt to chat model...")
+
         response = run_chat(
             instructions=self.instructions,
             model=self.chat_model,
-            prompt=f"Context: {context}\nQuestion: {question}"
+            prompt=prompt
         )
+
         if response:
-            return response
+            print(f"[DEBUG] Chat model response received")
+            return response.strip()
         else:
-            raise ValueError("Failed to generate response.")
+            raise ValueError("[ERROR] Failed to generate response.")
 
     def answer(self, question: str) -> str:
-        """Answer a question using RAG pipeline."""
-        # Step 1: Generate embeddings for the question
+        """Main RAG pipeline."""
+        print(f"[RAG] Answering: {question}")
+
+        # Step 1: Embed question
         question_embeddings = self.generate_embeddings(question)
 
-        # Step 2: Search for relevant documents in Milvus
+        # Step 2: Retrieve relevant chunks
         retrieved_docs = self.search_documents(question_embeddings)
 
-        # Step 3: Combine retrieved documents into context
-        context = "\n".join(retrieved_docs)
+        # Step 3: Build context
+        context = "\n---\n".join(retrieved_docs)
 
-        # Step 4: Generate response using Argo chat API
-        answer = self.generate_response(context=context, question=question)
-
-        return answer
+        # Step 4: Generate and return answer
+        return self.generate_response(context=context, question=question)
