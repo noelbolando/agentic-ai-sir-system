@@ -1,13 +1,24 @@
-# agents.ui_agent.py
+# src/agents/ui_agent.py
 
+"""
+UI Agent is responsible for:
+1. Prompting user input.
+2. Classifying user intent.
+3. Prompting analysis question.
+4. Prompting user follow-up.
+5. Classifying user follow-up.
+6. Loading model params from the YAML file.
+7. Saving model params.
+8. Prompting user for model params.
+9. Validating user model params.
+"""
+
+# Import libraries
 import getpass
-import json
 import yaml
-
+# Import dependencies
 from utils.llm_utils import OllamaLLM
 
-# Get username
-username = getpass.getuser()
 
 class UIAgent:
     def __init__(
@@ -22,7 +33,8 @@ class UIAgent:
         self.params = self.load_params()
     
     def get_user_input(self):
-        user_input = input(f"\n [UI Agent]: Hello, {username}, how can I help you today?\n> ")
+        print("\n[UI Agent]: Hello I am a Virtual Interface Agent, how can I help you today?")
+        user_input = input("[UI Agent]: You can request to run a series of simulations, analyze data, or learn about model assumptions and/or infectious disease spread\n>").lower()
         return user_input
 
     def classify_intent(self, user_input: str) -> str:
@@ -38,6 +50,8 @@ class UIAgent:
         - 'run' a simulation
         - 'analyze' the results
         - 'learn' about model 'assumptions'
+        - 'learn' about infectious disease spread
+        - 'learn' about the history of infectious disease models
         - 'exit' the model
         - or something else
 
@@ -61,11 +75,11 @@ class UIAgent:
 
     def ask_analysis_question(self) -> str:
         """Prompt the user for a specific analysis question."""
-        return input("\n [UI Agent]: Sure, I can help with that. What would you like to know?\n> ")
+        return input("\n[UI Agent]: Sure, I can help with that. What would you like to know?\n> ")
 
     def follow_up(self):
         """Conditional edge function for directing user follow-up questions."""
-        user_follow_up = input(f"\n [UI Agent]: Is there anything else I can help you with?\n> ")
+        user_follow_up = input(f"\n[UI Agent]: Is there anything else I can help you with?\n> ")
         return user_follow_up
     
     def classify_followup(self, follow_up: str) -> str:
@@ -134,7 +148,7 @@ class UIAgent:
         for key, value in default_params.items():
             print(f"{key}: {value}")
         
-        params_choice = input("\n[UI Agent]: Would you prefer to use the default parameters or enter your own? ").lower()
+        params_choice = input("\n[UI Agent]: Would you prefer to use the default parameters or enter your own?\n>").lower()
 
         if any(keyword in params_choice.lower() for keyword in ["default", "default parameters"]):
             print("\n[UI Agent]: Thanks, using the default parameters to run the simulation!")

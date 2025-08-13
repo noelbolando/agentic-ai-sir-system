@@ -1,4 +1,4 @@
-# agents.rag_agent.py
+# src/agents/rag_agent.py
 
 """
 RAG agent is responsible for:
@@ -7,7 +7,7 @@ RAG agent is responsible for:
 3. sending the prompt to an LLM
 """
 
-# Import libraries
+# Import dependencies
 from utils.argo_utils import run_chat, run_embeddings, run_search
 
 class RAGAgent:
@@ -21,7 +21,7 @@ class RAGAgent:
         self.output_fields = output_fields
         self.limit = limit
 
-        self.embedding_model = "v3small"
+        self.embedding_model = "v3large"
         self.chat_model = "gpt4o"
 
         # Prompt with context injection
@@ -38,8 +38,8 @@ class RAGAgent:
         print(f"Generating embeddings for text: {text}")  # Debugging input
         embeddings = run_embeddings(model=self.embedding_model, prompts=[text])
         print(f"Embedding response: {embeddings}")  # Debugging response structure
-        if embeddings and "embeddings" in embeddings:
-            return embeddings["embeddings"]
+        if embeddings and "embedding" in embeddings:
+            return embeddings["embedding"]
         else:
             print(f"Embedding generation failed. Response: {embeddings}")  # Debugging response
             raise ValueError("Failed to generate embeddings.")
@@ -48,10 +48,12 @@ class RAGAgent:
         """Search for relevant documents in Milvus using Argo API."""
         results = run_search(
             collection=self.collection_name,
-            data=[vector],
+            data=vector,
             output_fields=self.output_fields,
             limit=self.limit
         )
+        print(f"Type of vector: {type(vector)}, Length: {len(vector)}")
+        print(f"Search results raw output: {results}")
         if results and "results" in results:
             return [result["page_content"] for result in results["results"]]
         else:

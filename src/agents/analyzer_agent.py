@@ -1,6 +1,15 @@
-# agents.analyzer_agent.py
+# src/agents/analyzer_agent.py
 
+"""
+Analyzer Agent is responsible for:
+1. Analyzing user questions
+2. Accessing calculation toolbox
+2. Choosing calculations based on user requests
+"""
+
+# Import libraries 
 import pandas as pd
+# Import dependencies
 from utils.analysis_tools import (
     calculate_peak_infection, 
     calculate_average_total_infected, 
