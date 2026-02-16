@@ -1,4 +1,4 @@
-# THE SIMPLEST, BUT NO SIMPLER, MULTI-AGENTIC-AI AGENT-BASED MODEL #
+# MULTI-AGENTIC-AI AGENT-BASED MODEL #
 
 ## Introduction ##
 This repo contains all the source code for the simpliest, but no simplier, multi-agentic-AI, agent-based model. A stochastic SIR model is used as the prototype model for demonstrating the capabilities of agentic-AI in agent-based modeling systems.
@@ -39,39 +39,51 @@ This project employs four AI agents to carry out the tasks described above. Thes
 
 | **Agent** | **Primary Task** | **Tools Used** | **Inputs** | **Outputs** |
 |-----------|------------------|----------------|------------|-------------|
-| `ControlAgent` | Intelligent decision-making | LLM API, logic/planning | Analyzer/Reporter data | Rerun requests, summary feedback |
-| `RunnerAgent` | Run simulations | `subprocess`, `python3`, script | `seed`, `output_path`| CSV/log file |
-| `AnalyzerAgent`| Analyze simulation output | `pandas`, `numpy`| Output from `RunnerAgent`| Stats/dict |
-| `ReporterAgent` | Generate reports | Templating, graphing | Analysis results | Report file(s) |
+| `Control Agent` | Intelligent decision-making | LLM API, logic/planning | Analyzer/Reporter data | Rerun requests, summary feedback |
+| `Model Agent` | Run simulations | `subprocess`, `python3`, script | `seed`, `output_path`| CSV/log file |
+| `Analyzer Agent`| Analyze simulation output | `pandas`, `numpy`| Output from `RunnerAgent`| Stats/dict |
+| `Reporter Agent` | Generate reports | Templating, graphing | Analysis results | Report file(s) |
+| `RAG Agent` | Retrieve, augment, generate responses | RAG, Milvus DB | User Prompts/System Requests | Responses/Communication Protocols |
+| `UI Agent` | Interface with user | LLM API | User Prompts | Responses/Communication Protocols |
 
 The AI agents are assigned roles, tasks, and tools, and are expected to communicate with one another through an interaction workflow which is described in more detail next.
 
 ## AI Agent Interaction Flow ##
 AI agents must interact and communicate after tasks are complete to track objective completion. The interaction between these agents is outlined below:
 
-1. **Control Agent (`control_agent.py`)**  
+1. **Control Agent (embedded in `main.py`)**  
    - Monitors all outputs and agent messages.  
    - Determines whether simulations should be rerun, adjusted, or summarized.  
    - Powered by an LLM to reason over results and recommend actions.
 
-2. **Runner Agent (`runner_agent.py`)**  
-   - Receives seed and output path from `Main`.  
+2. **Model Agent (`model_agent.py`)**  
+   - Receives seed and output path from `Control Agent`.  
    - Executes `simulation_sir.py` with those parameters via `subprocess`.  
    - Produces simulation output as a CSV or log file.
 
 3. **Analyzer Agent (`analyzer_agent.py`)**  
-   - Receives the output file from `RunnerAgent`.  
+   - Receives the output file from `Model Agent`.  
    - Loads data using `pandas`, computes statistics (i.e. peak infected).  
    - Returns a summary dictionary of analysis results.
 
 4. **Reporter Agent (`reporter_agent.py`)**  
-   - Receives the analysis results from `AnalyzerAgent`.  
+   - Receives the analysis results from `Analyzer Agent`.  
    - Generates a visual/text report (graphs, markdown summaries, etc.).  
    - Stores or returns the report path.
+  
+5. **RAG Agent (`rag_agent.py`)**  
+   - Receives user requests from `Control Agent`.  
+   - Retrieves, augments, and generates responses for users. 
+   - Stores or returns documents related to infectious disease spread.
+  
+6. **UI Agent (`ui_agent.py`)**  
+   - Interacts with user through a LLM.  
+   - Receives user requests and channels requests to `Control Agent`. 
+   - Returns responses to user from other agents, through the `Control Agent`.
 
 
 ## LLM Usage ##
-As previously mentioned, the Control Agent is powered by an LLM. For the purpose of this simpliest, but no simplier, model, the authors employed the use of an Ollama, an open-source LLM engine using Mistral LLM. To initialize the LLM, users must prime the model with the following command: `ollama run mistral`
+As previously mentioned, the Control Agent is powered by an LLM. For the purpose of this system, the authors employed the use of an Ollama, an open-source LLM engine using Mistral LLM. To initialize the LLM, users must prime the model with the following command: `ollama run mistral`
 
 ## Try it Yourself ##
 To get started, initialize the program with the following command: `python3 main.py`
