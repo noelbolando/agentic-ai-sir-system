@@ -11,4 +11,4 @@ This workflow outlines the high-level agent interactions and how agents use tool
 <img width="581" height="398" alt="Screenshot 2026-02-16 at 11 30 05 AM" src="https://github.com/user-attachments/assets/3f266762-ebee-4e43-8897-e66da2e015a8" />
 
 
-## For a more in-depth explanation of the protocols and procedures in this project, please direct yourself to the `src` directory. ##
+**For a more in-depth explanation of the protocols and procedures in this project, please direct yourself to the `src` directory.**
