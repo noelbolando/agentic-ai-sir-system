@@ -37,9 +37,10 @@ st.caption(
     "using stochastic SIR models."
 )
 
-# ── Groq API key ──────────────────────────────────────────────────────────────
-# Read from Streamlit Secrets first, fall back to nothing (user can paste in UI).
-_GROQ_KEY_FROM_SECRETS = st.secrets.get("GROQ_API_KEY", "") if hasattr(st, "secrets") else ""
+# ── Groq API key — loaded exclusively from Streamlit Secrets ─────────────────
+# Configure this in the Streamlit Cloud dashboard under App Settings → Secrets.
+# Never expose the key in the UI.
+groq_api_key = st.secrets.get("GROQ_API_KEY", "") if hasattr(st, "secrets") else ""
 
 # ── Session state ─────────────────────────────────────────────────────────────
 if "sim_data" not in st.session_state:
@@ -49,21 +50,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_PATH = os.path.join(BASE_DIR, "logs", "all_agent_logs.csv")
 os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
 
-# ── Sidebar — Groq API key ────────────────────────────────────────────────────
+# ── Sidebar — model selector only ────────────────────────────────────────────
 with st.sidebar:
     st.header("⚙ Configuration")
-    st.markdown(
-        "The **simulation** and **analysis** tabs work without any API key. "
-        "The **AI Report** and **Learn / Q&A** tabs need a [Groq API key](https://console.groq.com) "
-        "(free tier available)."
-    )
-    groq_api_key = st.text_input(
-        "Groq API Key",
-        type="password",
-        value=_GROQ_KEY_FROM_SECRETS,
-        placeholder="gsk_...",
-        help="Get a free key at console.groq.com",
-    )
     groq_model = st.selectbox(
         "Groq Model",
         ["llama-3.3-70b-versatile", "llama3-8b-8192", "mixtral-8x7b-32768"],
