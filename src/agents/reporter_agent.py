@@ -5,11 +5,19 @@ Reporter Agent is responsible for reporting analyzed calculations.
 """
 
 # Import dependencies
-from utils.llm_utils import OllamaLLM
+from utils.llm_utils import LLMClient, OllamaLLM
+
 
 class ReporterAgent:
-    def __init__(self, model="mistral"):
-        self.llm = OllamaLLM(model)
+    def __init__(self, model="mistral", backend="ollama", base_url=None, api_key=None):
+        """
+        Args:
+            model (str): LLM model name.
+            backend (str): "ollama" or "groq".
+            base_url (str): Ollama endpoint (ollama only).
+            api_key (str): API key (groq only).
+        """
+        self.llm = LLMClient(backend=backend, model=model, base_url=base_url, api_key=api_key)
 
     def report(self, user_question, analysis_results):
         """Use an LLM to summarize the analysis results in a human-readable format."""

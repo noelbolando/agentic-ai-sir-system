@@ -24,9 +24,18 @@ from utils.analysis_tools import (
 )
 
 class AnalyzerAgent:
-    def __init__(self, state_logs: str):
-        self.state_logs = state_logs
-        self.state_data = pd.read_csv(self.state_logs)
+    def __init__(self, state_logs: str = None, state_data: pd.DataFrame = None):
+        """
+        Args:
+            state_logs (str): Path to the CSV log file (used by CLI workflow).
+            state_data (pd.DataFrame): Pre-loaded DataFrame (used by Streamlit workflow).
+        """
+        if state_data is not None:
+            self.state_data = state_data
+        elif state_logs is not None:
+            self.state_data = pd.read_csv(state_logs)
+        else:
+            raise ValueError("Either state_logs (file path) or state_data (DataFrame) must be provided.")
     
     def analyze(self, question: str) -> dict:
         question = question.lower()

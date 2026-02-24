@@ -83,12 +83,9 @@ def calculate_peak_infection_std(df: pd.DataFrame) -> dict:
 def plot_state_dynamics(df: pd.DataFrame):
         """
         Plots the SIR infection state curves for all simulation runs.
-        
-        This calculation uses the agent state log data.
 
-        Logic:
-            For each run_id, find the agent infection states.
-
+        Returns:
+            matplotlib.figure.Figure: The generated figure (use st.pyplot(fig) in Streamlit).
         """
         grouped = df.groupby(["run_id", "step", "state"]).size().reset_index(name="count")
         pivot_df = grouped.pivot_table(index=["run_id", "step"], columns="state", values="count", fill_value=0)
@@ -97,38 +94,39 @@ def plot_state_dynamics(df: pd.DataFrame):
         light_color_map = {"S": "#a6c8ff", "I": "#ffb3b3", "R": "#b3ffb3"}  # lighter shades
         dark_color_map = {"S": "#005bbb", "I": "#cc0000", "R": "#009900"}  # bold average curves
         label_map = {"S": "Susceptible (S)", "I": "Infected (I)", "R": "Recovered (R)"}
-        plotted_labels = set()
 
-        # Plot for each run
+        fig, ax = plt.subplots(figsize=(10, 5))
+
+        # Plot for each run (faint background lines)
         for run_id, run_data in pivot_df.groupby(level=0):
             run_data = run_data.droplevel(0)
             for state in ["S", "I", "R"]:
-                label = label_map[state] if state not in plotted_labels else None
-                plt.plot(
+                ax.plot(
                     run_data.index,
                     run_data[state],
                     color=light_color_map[state],
-                    alpha=0.6,
-                    linewidth=1
+                    alpha=0.3,
+                    linewidth=0.8,
                 )
+
         # Compute and plot the mean across runs
         mean_df = pivot_df.groupby("step").mean()
         for state in ["S", "I", "R"]:
-            plt.plot(
+            ax.plot(
                 mean_df.index,
                 mean_df[state],
                 color=dark_color_map[state],
                 linewidth=2.5,
-                label=label_map[state]
+                label=label_map[state],
             )
 
         # Labels and legend
-        plt.xlabel("Step")
-        plt.ylabel("Agent Count")
-        plt.title("Epidemic State Dynamics")
-        plt.legend()
-        plt.tight_layout()
-        plt.show()
+        ax.set_xlabel("Step (day)")
+        ax.set_ylabel("Agent Count")
+        ax.set_title("Epidemic State Dynamics")
+        ax.legend()
+        fig.tight_layout()
+        return fig
 
 def calculate_infection_decline_rate(df: pd.DataFrame) -> float:
     """

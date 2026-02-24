@@ -243,13 +243,26 @@ class Model:
             self.step(step)
 
 # === Main ===
-def main(params):
+def main(params, log_path="src/logs/all_agent_logs.csv", progress_callback=None):
     """
     Main function to run the simulation.
-    Logging all agent states and infection events per run. 
+    Logging all agent states and infection events per run.
+
+    Args:
+        params (dict): Simulation parameters.
+        log_path (str): Path to write the CSV log file.
+        progress_callback (callable): Optional callback(completed, total) called after each run.
+
+    Returns:
+        pd.DataFrame: Agent state logs across all runs.
     """
-    
+    import os
+
     all_agent_state_logs = []
+
+    log_dir = os.path.dirname(log_path)
+    if log_dir:
+        os.makedirs(log_dir, exist_ok=True)
 
     print("Starting main simulation loop")
     for run_id in range(params["num_runs"]):
@@ -258,13 +271,14 @@ def main(params):
         model.run()
         all_agent_state_logs.extend(model.agent_state_logs)
         print(f"Run {run_id + 1} complete.")
-    
-    # Convert to DataFrames
-    agent_df = pd.DataFrame(all_agent_state_logs)
-    # Convert to csv
-    agent_df.to_csv("src/logs/all_agent_logs.csv", index=False)
+        if progress_callback:
+            progress_callback(run_id + 1, params["num_runs"])
 
-    return
+    # Convert to DataFrame and write CSV
+    agent_df = pd.DataFrame(all_agent_state_logs)
+    agent_df.to_csv(log_path, index=False)
+
+    return agent_df
 
 if __name__ == "__main__":
     default_params = {
