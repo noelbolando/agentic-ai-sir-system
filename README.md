@@ -110,33 +110,6 @@ The simulation engine (`src/sir_sim.py`) implements a **stochastic, agent-based 
     └── knowledge/
         └── sir_model_information.md  # RAG knowledge base
 ```
-
----
-
-## Getting Started
-
-### Run locally
-
-```bash
-git clone https://github.com/your-username/agentic-ai-sir-system.git
-cd agentic-ai-sir-system
-pip install -r requirements.txt
-
-# Optional: add your Groq key for AI-powered tabs
-cp .streamlit/secrets.toml.example .streamlit/secrets.toml
-# edit secrets.toml and paste your key
-
-streamlit run app.py
-```
-
-The app opens at `http://localhost:8501`.
-
-### Get a free Groq API key
-
-1. Sign up at [console.groq.com](https://console.groq.com) — no credit card required
-2. Create an API key
-3. Paste it into `.streamlit/secrets.toml` for local use, or into **App Settings → Secrets** on Streamlit Cloud
-
 ---
 
 ## Agentic AI vs. Modular Programming
